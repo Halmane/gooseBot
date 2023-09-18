@@ -16,13 +16,13 @@ async Task MainAsync()
         new DiscordSocketConfig() { GatewayIntents = GatewayIntents.All }
     );
 
-    var sqliteController = new SqliteController("D:\\Huita\\gooseBot\\LogBD.db");
+    var sqliteController = new SqliteLogger("D:\\Huita\\gooseBot\\LogBD.db");
     var _interactionService = new InteractionService(_client.Rest);
     try
     {
         _client.Ready += async () =>
         {
-            await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), services: null);
+            await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), servicesProvider);
             await _interactionService.RegisterCommandsGloballyAsync();
         };
     }
@@ -37,11 +37,11 @@ async Task MainAsync()
     
     _client.Log += (log) =>
     {
-        sqliteController.Logger(log.Source,log.Message);
+        sqliteController.LogIntoDb(log.Source,log.Message);
         return Task.CompletedTask;
     };
-    _client.MessageReceived += async (messsage) => { if(messsage.Content.Length>0) sqliteController.Logger($"Channel:{messsage.Channel.Id} Author ID:{messsage.Author.Id}",$"Send message: {messsage.Content}"); };
-    _client.RoleCreated += async (messsage) => { sqliteController.Logger($"Role ID:{messsage.Id}", $"Create Role:{messsage.Name}");};
+    _client.MessageReceived += async (messsage) => { if(messsage.Content.Length>0) sqliteController.LogIntoDb($"Channel:{messsage.Channel.Id} Author ID:{messsage.Author.Id}",$"Send message: {messsage.Content}"); };
+    _client.RoleCreated += async (messsage) => { sqliteController.LogIntoDb($"Role ID:{messsage.Id}", $"Create Role:{messsage.Name}");};
     _client.SlashCommandExecuted += async (interaction) =>
     {
         var ctx = new SocketInteractionContext<SocketSlashCommand>(_client, interaction);

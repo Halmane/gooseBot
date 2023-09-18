@@ -9,14 +9,14 @@ public class CommandGroupModule
     : InteractionModuleBase<SocketInteractionContext<SocketSlashCommand>>
 {
     [SlashCommand("echo", "echo")]
-    public async Task Echo(string echo)
+    public async Task EchoAsync(string echo)
     {
         await RespondAsync(echo);
         
     }
 
     [SlashCommand("list-roles", "list-roles")]
-    public async Task ListOfRoles(IUser user)
+    public async Task ShowListOfRolesAsync(IUser user)
     {
         var guildUser = (SocketGuildUser)user;
         var roleList = string.Join(
@@ -37,7 +37,7 @@ public class CommandGroupModule
     }
 
     [SlashCommand("change-roles", "change-roles")]
-    public async Task ChangeRoles(IUser user, IRole role)
+    public async Task ChangeRoleAsync(IUser user, IRole role)
     {
         var guildUser = (SocketGuildUser)user;
         foreach (var Role in guildUser.Roles)
