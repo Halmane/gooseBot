@@ -13,7 +13,6 @@ public class CommandGroupModule
     public async Task EchoAsync(string echo)
     {
         await RespondAsync(echo);
-        
     }
 
     [SlashCommand("list-roles", "list-roles")]
@@ -58,10 +57,21 @@ public class CommandGroupModule
     [SlashCommand("delete-message", "delete-message")]
     public async Task DeleteMessages(int count)
     {
-        var messageList = Context.Channel.GetCachedMessages(count);
-        foreach (var message in messageList) 
+        var channel = Context.Channel;
+        if (channel is SocketTextChannel textChannel)
         {
-            await Context.Channel.DeleteMessageAsync(message.Id);
+            var messageList = Context.Channel.GetMessagesAsync(count);
+            await foreach (var messages in messageList)
+            {
+                await textChannel.DeleteMessagesAsync(messages);
+            }
+            await RespondAsync($"{count} messeges deleted");
+            await Task.Delay(3000);
+            var lastMassege = Context.Channel.GetMessagesAsync(1);
+            await foreach (var messages in lastMassege)
+            {
+                await textChannel.DeleteMessagesAsync(messages);
+            }
         }
     }
 }

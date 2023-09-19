@@ -17,14 +17,25 @@ public class Logger
         _sqliteController = sqliteController;
         RoleCreated();
         MessageReceived();
+        MessageUpdated();
+        DeleteMessage();
     }  
 
     private void RoleCreated()
     {
-        _client.RoleCreated += async (messsage) => { _sqliteController.LogIntoDb($"Role ID:{messsage.Id}", $"Create Role:{messsage.Name}"); };
+        _client.RoleCreated += async (role) => { await _sqliteController.LogIntoDb($"Role ID:{role.Id}", $"Create Role:{role.Name}"); };
     }
     private void MessageReceived()
     {
-        _client.MessageReceived += async (messsage) => { if (messsage.Content.Length > 0) _sqliteController.LogIntoDb($"Channel:{messsage.Channel.Id} Author ID:{messsage.Author.Id}", $"Send message: {messsage.Content}"); };
+        _client.MessageReceived += async (messsage) => { if (messsage.Content.Length > 0) await _sqliteController.LogIntoDb($"Channel:{messsage.Channel.Id} Author ID:{messsage.Author.Id}", $"Send message: {messsage.Content}"); };
+    }
+    private void MessageUpdated()
+    {
+        _client.MessageUpdated += async (oldMessage,message,channel ) => { await _sqliteController.LogIntoDb($"Channel:{channel.Id}", $"{oldMessage.Value} -> {message}"); };
+    }
+
+    private void DeleteMessage()
+    {
+        _client.MessageDeleted += async (message,channel) => { await _sqliteController.LogIntoDb($"Channel:{channel.Id}",$"Message delete: {message.Id}/{message.Value}"); };
     }
 }

@@ -13,7 +13,7 @@ public class SqliteLogger : IDisposable
         _connection.Open();
     }
 
-    public void LogIntoDb(string source, string logMessage)
+    public async Task LogIntoDb(string source, string logMessage)
     {
         _connection.Execute(
             "Insert into Log(DateTime,Source,LogMessage) Values(@dateTime,@source,@log);",
