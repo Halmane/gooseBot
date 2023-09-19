@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Discord.Rest;
 using Discord.WebSocket;
 using System.ComponentModel.Design;
 
@@ -55,8 +56,12 @@ public class CommandGroupModule
     }
 
     [SlashCommand("delete-message", "delete-message")]
-    public async Task DeleteMessage(int count)
+    public async Task DeleteMessages(int count)
     {
-        
+        var messageList = Context.Channel.GetCachedMessages(count);
+        foreach (var message in messageList) 
+        {
+            await Context.Channel.DeleteMessageAsync(message.Id);
+        }
     }
 }

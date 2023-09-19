@@ -5,18 +5,19 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using gooseBot;
 
+var sqliteController = new SqliteLogger("D:\\Huita\\gooseBot\\LogBD.db");
+var _client = new DiscordSocketClient(
+        new DiscordSocketConfig() { GatewayIntents = GatewayIntents.All }
+    );
 var services = new ServiceCollection();
-var servicesProvider = services.BuildServiceProvider();
-DiscordSocketClient _client;
+var servicesProvider = services.AddSingleton<Logger>()
+                               .AddSingleton(sqliteController)
+                               .AddSingleton(_client)
+                               .BuildServiceProvider();
 await MainAsync();
 
 async Task MainAsync()
 {
-    _client = new DiscordSocketClient(
-        new DiscordSocketConfig() { GatewayIntents = GatewayIntents.All }
-    );
-
-    var sqliteController = new SqliteLogger("D:\\Huita\\gooseBot\\LogBD.db");
     var _interactionService = new InteractionService(_client.Rest);
     try
     {
@@ -34,14 +35,15 @@ async Task MainAsync()
             return Task.CompletedTask;
         };
     }
-    
+
+    servicesProvider.GetService<Logger>();
+
     _client.Log += (log) =>
     {
         sqliteController.LogIntoDb(log.Source,log.Message);
         return Task.CompletedTask;
     };
-    _client.MessageReceived += async (messsage) => { if(messsage.Content.Length>0) sqliteController.LogIntoDb($"Channel:{messsage.Channel.Id} Author ID:{messsage.Author.Id}",$"Send message: {messsage.Content}"); };
-    _client.RoleCreated += async (messsage) => { sqliteController.LogIntoDb($"Role ID:{messsage.Id}", $"Create Role:{messsage.Name}");};
+    
     _client.SlashCommandExecuted += async (interaction) =>
     {
         var ctx = new SocketInteractionContext<SocketSlashCommand>(_client, interaction);
@@ -50,7 +52,7 @@ async Task MainAsync()
 
     await _client.LoginAsync(
         TokenType.Bot,
-        "MTE1MTg3MTkzNzMxNjkzMzY1Mg.GXluRj.7ofg9v4LGLkcmUnPXnm9y4lZR2dhptoz4z3znI"
+        "MTE1MTg3MTkzNzMxNjkzMzY1Mg.Gd3LUu.r1tuWRe6e_DvElG4l-6ilZRoyKm6W3sUIkR9Ho"
     );
     await _client.StartAsync();
     await Task.Delay(-1);
