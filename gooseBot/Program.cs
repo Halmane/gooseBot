@@ -50,7 +50,7 @@ _client.SlashCommandExecuted += async (interaction) =>
     await _interactionService.ExecuteCommandAsync(ctx, servicesProvider);
 };
 
-using (FileStream fs = new FileStream("D:\\Huita\\gooseBot\\gooseBot\\DiscordKey.js", FileMode.OpenOrCreate))
+using (FileStream fs = new FileStream("D:\\Huita\\gooseBot\\gooseBot\\DiscordKey.txt", FileMode.OpenOrCreate))
 {
     await _client.LoginAsync(
     TokenType.Bot,
