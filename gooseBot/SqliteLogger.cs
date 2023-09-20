@@ -15,7 +15,7 @@ public class SqliteLogger : IDisposable
 
     public async Task LogIntoDb(string source, string logMessage)
     {
-        _connection.Execute(
+        await _connection.ExecuteAsync(
             "Insert into Log(DateTime,Source,LogMessage) Values(@dateTime,@source,@log);",
             new { source = source, log = logMessage, dateTime = DateTime.UtcNow }
         );

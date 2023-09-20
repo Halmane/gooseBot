@@ -5,17 +5,18 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using gooseBot;
 using System.Text.Json;
-using System;
 
-var sqliteController = new SqliteLogger("D:\\Huita\\gooseBot\\LogBD.db");
+var sqliteController = new SqliteLogger("D:\\C#Project\\Bot\\gooseBot\\LogBD.db");
 var _client = new DiscordSocketClient(
     new DiscordSocketConfig() { GatewayIntents = GatewayIntents.All }
 );
 var services = new ServiceCollection();
 var servicesProvider = services
     .AddSingleton<Logger>()
-    .AddSingleton(sqliteController)
-    .AddSingleton(_client)
+    .AddSingleton(new SqliteLogger("D:\\C#Project\\Bot\\gooseBot\\LogBD.db"))
+    .AddSingleton(
+        new DiscordSocketClient(new DiscordSocketConfig() { GatewayIntents = GatewayIntents.All })
+    )
     .BuildServiceProvider();
 
 var _interactionService = new InteractionService(_client.Rest);
@@ -50,12 +51,9 @@ _client.SlashCommandExecuted += async (interaction) =>
     await _interactionService.ExecuteCommandAsync(ctx, servicesProvider);
 };
 
-using (FileStream fs = new FileStream("D:\\Huita\\gooseBot\\gooseBot\\DiscordKey.txt", FileMode.OpenOrCreate))
+using (FileStream fs = new FileStream("DiscordKey.txt", FileMode.OpenOrCreate))
 {
-    await _client.LoginAsync(
-    TokenType.Bot,
-    JsonSerializer.Deserialize<string>(fs)
-);
+    await _client.LoginAsync(TokenType.Bot, JsonSerializer.Deserialize<string>(fs));
 }
 
 await _client.StartAsync();

@@ -1,8 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Discord.Rest;
 using Discord.WebSocket;
-using System.ComponentModel.Design;
 
 namespace gooseBot;
 
@@ -67,11 +65,7 @@ public class CommandGroupModule
             }
             await RespondAsync($"{count} messeges deleted");
             await Task.Delay(3000);
-            var lastMassege = Context.Channel.GetMessagesAsync(1);
-            await foreach (var messages in lastMassege)
-            {
-                await textChannel.DeleteMessagesAsync(messages);
-            }
+            await DeleteOriginalResponseAsync();
         }
     }
 }

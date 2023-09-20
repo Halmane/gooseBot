@@ -1,9 +1,5 @@
 ﻿using Discord.WebSocket;
-using Discord;
-using Discord.Interactions;
-using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
-using gooseBot;
+
 
 namespace gooseBot;
 
