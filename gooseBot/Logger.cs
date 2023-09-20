@@ -3,7 +3,7 @@
 
 namespace gooseBot;
 
-public class Logger
+public class Logger 
 {
     private SqliteLogger _sqliteController;
     private DiscordSocketClient _client;
@@ -19,19 +19,19 @@ public class Logger
 
     private void RoleCreated()
     {
-        _client.RoleCreated += async (role) => { await _sqliteController.LogIntoDb($"Role ID:{role.Id}", $"Create Role:{role.Name}"); };
+        _client.RoleCreated += async (role) => { await _sqliteController.LogIntoDbAsync($"Role ID:{role.Id}", $"Create Role:{role.Name}"); };
     }
     private void MessageReceived()
     {
-        _client.MessageReceived += async (messsage) => { if (messsage.Content.Length > 0) await _sqliteController.LogIntoDb($"Channel:{messsage.Channel.Id} Author ID:{messsage.Author.Id}", $"Send message: {messsage.Content}"); };
+        _client.MessageReceived += async (messsage) => { if (messsage.Content.Length > 0) await _sqliteController.LogIntoDbAsync($"Channel:{messsage.Channel.Id} Author ID:{messsage.Author.Id}", $"Send message: {messsage.Content}"); };
     }
     private void MessageUpdated()
     {
-        _client.MessageUpdated += async (oldMessage,message,channel ) => { await _sqliteController.LogIntoDb($"Channel:{channel.Id}", $"{oldMessage.Value} -> {message}"); };
+        _client.MessageUpdated += async (oldMessage,message,channel ) => { await _sqliteController.LogIntoDbAsync($"Channel:{channel.Id}", $"{oldMessage.Value} -> {message}"); };
     }
 
     private void DeleteMessage()
     {
-        _client.MessageDeleted += async (message,channel) => { await _sqliteController.LogIntoDb($"Channel:{channel.Id}",$"Message delete: {message.Id}/{message.Value}"); };
+        _client.MessageDeleted += async (message,channel) => { await _sqliteController.LogIntoDbAsync($"Channel:{channel.Id}",$"Message delete: {message.Id}/{message.Value}"); };
     }
 }
