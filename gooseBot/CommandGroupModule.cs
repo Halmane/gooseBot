@@ -68,4 +68,10 @@ public class CommandGroupModule
             await DeleteOriginalResponseAsync();
         }
     }
+
+    [SlashCommand("goose", "goose")]
+    public async Task ZaZhopuKus(IUser user)
+    {
+        await RespondAsync($"{user.Mention} за жопу кусь");
+    }
 }
