@@ -19,49 +19,50 @@ using (
         .BuildServiceProvider()
 )
 {
-    var _client = servicesProvider.GetService<DiscordSocketClient>();
+    var client = servicesProvider.GetService<DiscordSocketClient>();
 
-    var sqliteController = servicesProvider.GetService<SqliteLogger>();
+    var sqliteLogger = servicesProvider.GetService<SqliteLogger>();
+    servicesProvider.GetService<Logger>();
 
-    var _interactionService = new InteractionService(_client.Rest);
+    var interactionService = new InteractionService(client.Rest);
 
     try
     {
-        _client.Ready += async () =>
+        client.Ready += async () =>
         {
-            await _interactionService.AddModulesAsync(
+            await interactionService.AddModulesAsync(
                 Assembly.GetEntryAssembly(),
                 servicesProvider
             );
-            await _interactionService.RegisterCommandsGloballyAsync();
+            await interactionService.RegisterCommandsGloballyAsync();
         };
     }
     catch
     {
-        _client.Log += (log) =>
+        client.Log += (log) =>
         {
             Console.WriteLine(log);
             return Task.CompletedTask;
         };
     }
 
-    _client.Log += (log) =>
+    client.Log += (log) =>
     {
-        sqliteController.LogIntoDbAsync(log.Source, log.Message);
+        sqliteLogger.LogIntoDbAsync(log.Source, log.Message);
         return Task.CompletedTask;
     };
 
-    _client.SlashCommandExecuted += async (interaction) =>
+    client.SlashCommandExecuted += async (interaction) =>
     {
-        var ctx = new SocketInteractionContext<SocketSlashCommand>(_client, interaction);
-        await _interactionService.ExecuteCommandAsync(ctx, servicesProvider);
+        var ctx = new SocketInteractionContext<SocketSlashCommand>(client, interaction);
+        await interactionService.ExecuteCommandAsync(ctx, servicesProvider);
     };
 
     using (FileStream fs = new FileStream("DiscordKey.txt", FileMode.OpenOrCreate))
     {
-        await _client.LoginAsync(TokenType.Bot, JsonSerializer.Deserialize<string>(fs));
+        await client.LoginAsync(TokenType.Bot, JsonSerializer.Deserialize<string>(fs));
     }
 
-    await _client.StartAsync();
+    await client.StartAsync();
     await Task.Delay(-1);
 }
